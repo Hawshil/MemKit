@@ -7,6 +7,7 @@ struct BlockHeader
 {
 	std::size_t size;
 	bool isFree;
+	BlockHeader* next;
 };
 
 void* memalloc(std::size_t size);

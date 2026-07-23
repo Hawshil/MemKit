@@ -1,6 +1,8 @@
 #include "memalloc.hpp"
 #include <unistd.h>
 
+static BlockHeader* head = nullptr;
+
 void* memalloc(std::size_t RequestedSize)
 {
 	// allocate space for both metadata and the user requested size
