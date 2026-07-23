@@ -1,21 +1,23 @@
-#include <iostream>
 #include "memalloc.hpp"
 #include <unistd.h>
 
-void* memalloc(std::size_t size)
+void* memalloc(std::size_t RequestedSize)
 {
-	std::cout << sbrk(0) << std::endl;
-	sbrk(100);
-	std::cout << sbrk(0) << std::endl;
+	// allocate space for both metadata and the user requested size
+	std::size_t totalSize = RequestedSize + sizeof(BlockHeader);
+	BlockHeader* header = static_cast<BlockHeader*>(sbrk(totalSize));
 
-	void* block = sbrk(size);
-
-	if(block == (void*)-1)
+	// sbrk returns (void*)-1 on failure
+	if(header == reinterpret_cast<BlockHeader*>((BlockHeader*)-1))
 	{
 		return nullptr;
 	}
 
-	return block;
+	header->size = RequestedSize;
+	header->isFree = false;
+
+	// return the memory immediately after the metadata (block header)
+	return header + 1;
 }
 
 
