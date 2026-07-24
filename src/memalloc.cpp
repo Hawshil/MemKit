@@ -34,9 +34,6 @@ void* memalloc(std::size_t RequestedSize)
 		return nullptr;
 	}
 	
-	// allocate space for both metadata and the user requested size
-	std::size_t totalSize = RequestedSize + sizeof(BlockHeader);
-	
 	// check for existing free block
 	BlockHeader* header = get_free_block(RequestedSize);
 
@@ -45,6 +42,9 @@ void* memalloc(std::size_t RequestedSize)
 		header->isFree = false;
 		return header + 1;
 	}
+
+	// allocate space for both metadata and the user requested size
+	std::size_t totalSize = RequestedSize + sizeof(BlockHeader);
 
 	// else allocate new sbrk block
 	header = static_cast<BlockHeader*>(sbrk(totalSize));
@@ -83,5 +83,34 @@ void memfree(void* ptr)
 
 	BlockHeader* header = static_cast<BlockHeader*>(ptr) - 1;
 
-	header->isFree = true;	
+	if(header != tail)
+	{
+		header->isFree = true;
+		return;	
+	}
+
+	if(head == tail)
+	{
+		// shrink
+		sbrk(-(sizeof(BlockHeader) + header->size));	
+
+		head = nullptr;
+		tail = nullptr;
+		return;
+	}
+		
+	BlockHeader* current = head;
+
+	while(current->next != tail)
+	{
+		current = current->next;
+	}
+
+	current->next = nullptr;
+	tail = current;
+	
+	// shrink
+	sbrk(-(sizeof(BlockHeader) + header->size));
+		
+	return;
 }
