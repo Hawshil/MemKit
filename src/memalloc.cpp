@@ -29,6 +29,11 @@ namespace
 
 void* memalloc(std::size_t RequestedSize)
 {
+	if(RequestedSize == 0)
+	{
+		return nullptr;
+	}
+	
 	// allocate space for both metadata and the user requested size
 	std::size_t totalSize = RequestedSize + sizeof(BlockHeader);
 	
@@ -67,4 +72,16 @@ void* memalloc(std::size_t RequestedSize)
 	
 	// return the memory immediately after the metadata (block header)
 	return header + 1;
+}
+
+void memfree(void* ptr)
+{
+	if(ptr == nullptr)
+	{
+		return;
+	}
+
+	BlockHeader* header = static_cast<BlockHeader*>(ptr) - 1;
+
+	header->isFree = true;	
 }

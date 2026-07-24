@@ -12,7 +12,7 @@ struct alignas(alignment) BlockHeader
 	BlockHeader* next;
 };
 
-void* 	memalloc (std::size_t size);
+void* 	memalloc (std::size_t RequestedSize);
 void 	memfree	(void* ptr);
 void* 	memcalloc (std::size_t num, std::size_t size);
 void* 	memrealloc (void* ptr, std::size_t size);

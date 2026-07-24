@@ -2,9 +2,15 @@
 #include "memalloc.hpp"
 int main()
 {
-	int* value = static_cast<int*>(memalloc(sizeof(int))); 
-	*value = 43;
-	std::cout << *value << std::endl;
+	void* p = memalloc(64);
+
+	memfree(p);
+
+	void* q = memalloc(64);
+
+	std::cout << p << std::endl;
+	std::cout << q  << std::endl;
+	
 	return 0;
 }
 
