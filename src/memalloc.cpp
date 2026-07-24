@@ -2,6 +2,7 @@
 #include <unistd.h>
 
 static BlockHeader* head = nullptr;
+static BlockHeader* tail = nullptr;
 
 void* memalloc(std::size_t RequestedSize)
 {
