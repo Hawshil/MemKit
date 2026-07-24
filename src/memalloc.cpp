@@ -31,7 +31,18 @@ void* memalloc(std::size_t RequestedSize)
 {
 	// allocate space for both metadata and the user requested size
 	std::size_t totalSize = RequestedSize + sizeof(BlockHeader);
-	BlockHeader* header = static_cast<BlockHeader*>(sbrk(totalSize));
+	
+	// check for existing free block
+	BlockHeader* header = get_free_block(RequestedSize);
+
+	if(header != nullptr)
+	{
+		header->isFree = false;
+		return header + 1;
+	}
+
+	// else allocate new sbrk block
+	header = static_cast<BlockHeader*>(sbrk(totalSize));
 
 	// sbrk returns (void*)-1 on failure
 	if(header == reinterpret_cast<BlockHeader*>(-1))
