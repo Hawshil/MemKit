@@ -5,6 +5,28 @@
 static BlockHeader* head = nullptr;
 static BlockHeader* tail = nullptr;
 
+// unnamed namespace for internal helper functions used only by the allocator
+namespace 
+{
+	// returns the first free block with requested size or greater
+	BlockHeader* get_free_block(std::size_t RequestedSize)
+	{
+		BlockHeader* current = head;
+	
+		while(current != nullptr)
+		{
+			if((current->size >= RequestedSize) && (current->isFree == true))
+			{
+				return current;
+			}	
+
+			current = current->next;
+		}
+
+		return nullptr; 
+	}
+}
+
 void* memalloc(std::size_t RequestedSize)
 {
 	// allocate space for both metadata and the user requested size
