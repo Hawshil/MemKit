@@ -25,6 +25,18 @@ namespace
 
 		return nullptr; 
 	}
+
+	std::size_t alignSize(std::size_t RequestedSize)
+	{
+		return (RequestedSize + alignment - 1) & ~(alignment - 1);
+
+		if((RequestedSize % alignment) == 0)
+		{
+			return RequestedSize;
+		}
+
+		return RequestedSize + alignment - (RequestedSize % alignment);
+	}
 }
 
 void* memalloc(std::size_t RequestedSize)
@@ -44,7 +56,8 @@ void* memalloc(std::size_t RequestedSize)
 	}
 
 	// allocate space for both metadata and the user requested size
-	std::size_t totalSize = RequestedSize + sizeof(BlockHeader);
+	std::size_t alignedSize = alignSize(RequestedSize);
+	std::size_t totalSize = alignedSize + sizeof(BlockHeader);
 
 	// else allocate new sbrk block
 	header = static_cast<BlockHeader*>(sbrk(totalSize));
@@ -55,7 +68,7 @@ void* memalloc(std::size_t RequestedSize)
 		return nullptr;
 	}
 
-	header->size = RequestedSize;
+	header->size = alignedSize;
 	header->isFree = false;
 	header->next = nullptr;
 
